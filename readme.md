@@ -2,6 +2,9 @@
 
 https://github.com/pleabargain/gemini-HTML-twinkle-twinkle
 
+# video
+https://youtu.be/CuNrXaWe8gE
+
 # Responsive Animated Piano Keyboard
 
 **Now with MIDI input, recording, chord support, scrolling display, and more!**
