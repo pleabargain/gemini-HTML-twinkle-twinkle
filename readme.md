@@ -2,20 +2,25 @@
 
 https://github.com/pleabargain/gemini-HTML-twinkle-twinkle
 
-# Animated Piano Keyboard - Twinkle Twinkle Little Star
+# Responsive Animated Piano Keyboard
 
 ## Description
 
-This is a simple web application that displays a basic piano keyboard and animates the playing of "Twinkle Twinkle Little Star". It visually highlights the keys being pressed, shows the name of the current note, and plays the corresponding sound using the Web Audio API. The entire application is built using vanilla HTML, CSS, and JavaScript, requiring no external libraries or frameworks.
+This is an interactive web application that displays a **5-octave piano keyboard (C2-C7)** which **responds dynamically to the browser window size**. It animates the playing of selected melodies like "Twinkle Twinkle Little Star" and "Mary Had A Little Lamb". The application visually highlights the keys being pressed, shows the name of the current note, and plays the corresponding sound using the Web Audio API. Users can **select different songs**, **adjust the playback speed**, and **view the underlying musical data structure** for the selected piece.
+
+The entire application is built using vanilla HTML, CSS, and JavaScript, requiring no external libraries or frameworks.
 
 ## Features
 
-*   Visual representation of a one-octave piano keyboard (C4 to C5) with white and black keys.
-*   Animation highlighting the keys sequentially as "Twinkle Twinkle Little Star" plays.
-*   Display area showing the name of the note currently being played (e.g., "C4", "G4").
-*   Audio playback of the notes using the Web Audio API's OscillatorNode.
-*   A "Play" button to initiate the song animation and audio.
-*   Built purely with vanilla HTML, CSS, and JavaScript.
+*   **Dynamically Generated Keyboard:** A 5-octave (C2-C7) keyboard is created programmatically using JavaScript.
+*   **Responsive Layout:** The piano keyboard adjusts its width to fit the browser window without requiring horizontal scrolling. White keys use CSS Flexbox, and black key positions are dynamically calculated.
+*   **Song Selection:** A dropdown menu allows users to choose from available melodies.
+*   **Playback Speed Control:** A slider allows adjusting the playback speed from slow (0.25x) to fast (2.5x).
+*   **Visual Animation:** Keys are highlighted sequentially as the selected melody plays.
+*   **Note Display:** Shows the name of the note currently being played (e.g., "C4", "G4").
+*   **Audio Playback:** Plays the notes using the Web Audio API's OscillatorNode, respecting the selected playback speed.
+*   **View Music Data:** Displays the raw JSON data for the currently selected song in a formatted view, updating automatically on selection change.
+*   **Pure Vanilla JS:** Built entirely with standard HTML, CSS, and JavaScript.
 
 ## Demo
 
@@ -25,64 +30,77 @@ To see it in action, simply open the `index.html` file in a modern web browser.
 
 ## Technology Stack
 
-*   **HTML:** Structures the piano keys, note display, and button. Uses `data-note` attributes to link elements to musical notes.
-*   **CSS:** Styles the piano keys for appearance, positions black keys correctly using `position: absolute`, and defines an `.active` class for the highlight effect with `transition` for smoothness.
+*   **HTML:** Structures the piano container, note display, song selection dropdown (`<select>`), speed control slider (`<input type="range">`), play button, and the JSON view area (`<pre>`). Uses `data-note` attributes on keys.
+*   **CSS:**
+    *   Styles the piano appearance.
+    *   Uses **Flexbox** (`display: flex`, `flex: 1`) on white keys for responsive width distribution.
+    *   Styles black keys with `position: absolute` and relative/limited dimensions. `left` and `transform` properties are set dynamically via JS.
+    *   Manages container layout (`#piano`, `.controls`) and styling for interactive elements.
+    *   Uses an `.active` class for the key highlight effect with `transition`.
 *   **JavaScript:** Handles all the logic:
-    *   **DOM Manipulation:** Selects elements, adds/removes CSS classes for highlighting, updates the note display text.
-    *   **Timing & Animation:** Uses `async/await` with `setTimeout` (wrapped in a `Promise` helper function) to sequence the note highlights and delays accurately.
-    *   **Data Structure:** Represents the melody as an array of objects, each containing the `note` name and its `duration` in milliseconds.
-    *   **Web Audio API:** Generates and plays the sound for each note:
-        *   Creates an `AudioContext` (on user interaction like button click).
-        *   Maps note names to specific sound frequencies (Hz).
-        *   Uses `OscillatorNode` to generate a simple waveform (triangle wave).
-        *   Uses `GainNode` to control volume and apply a short fade-out to prevent clicking sounds.
-        *   Connects the nodes (`oscillator -> gain -> destination`) and schedules note start/stop times.
-    *   **Event Handling:** Listens for clicks on the "Play" button to trigger the song playback.
+    *   **DOM Manipulation:** Dynamically creates key elements, selects UI controls, updates note display, adds/removes CSS classes, updates JSON view text.
+    *   **Keyboard Generation & Positioning:**
+        *   Loops through octaves and notes to create `div` elements for keys.
+        *   Uses `requestAnimationFrame` after initial render to calculate and apply the `style.left` and `style.transform` for black keys based on the computed position and size of the preceding white keys (`getBoundingClientRect`).
+        *   Handles window resize events (debounced) to recalculate black key positions.
+    *   **Timing & Animation:** Uses `async/await` with a `delay` helper function (which incorporates the `playbackSpeedFactor`) to sequence note highlights and pauses accurately.
+    *   **Data Structures:** Represents melodies as arrays of objects (`note`, `duration`). A main `melodies` object maps dropdown values to specific melody arrays. A `keyElementMap` object provides quick lookup of key DOM elements by note name.
+    *   **Web Audio API:** Generates and plays sound:
+        *   Initializes `AudioContext` on user interaction.
+        *   Maps note names to frequencies (`noteFrequencies` object).
+        *   Uses `OscillatorNode` and `GainNode`.
+        *   **Scales audio note duration** and fade-out times based on the `playbackSpeedFactor`.
+    *   **Event Handling:** Listens for clicks (play button), input changes (speed slider), selection changes (song dropdown), and window resize.
+    *   **State Management:** Uses variables like `playbackSpeedFactor` and `audioContext`.
 
 ## How It Works (Approach)
 
 1.  **HTML Structure:**
-    *   The piano is built using `<div>` elements. Each key (`.key`) has a `data-note` attribute (e.g., `data-note="C4"`) identifying the note it represents.
-    *   Keys are classed as `.white` or `.black`.
-    *   A dedicated `div` (`#note-display`) shows the current note name.
-    *   A `<button>` (`#play-button`) triggers the playback.
+    *   A main container (`#piano`) is defined, initially empty.
+    *   Control elements (`<select>`, `<input type="range">`, `<button>`) and display areas (`#note-display`, `#music-json-display`) are set up.
 
-2.  **CSS Styling:**
-    *   Basic dimensions, borders, and colors are applied to make the `div`s resemble piano keys.
-    *   `position: relative` is set on the main `#piano` container.
-    *   Black keys use `position: absolute` and calculated `left` properties to overlay the white keys correctly. `z-index` ensures they appear on top.
-    *   An `.active` class changes the `background-color` (and optionally `transform`) to visually highlight a key. A `transition` property makes this change smooth.
+2.  **JavaScript Initialization:**
+    *   On script load, the `createKeyboard()` function is called.
+    *   `createKeyboard()`:
+        *   Clears the `#piano` container.
+        *   Loops from `START_OCTAVE` to `END_OCTAVE`, creating `div` elements for each note ('C' through 'B').
+        *   Assigns `key`, `white`/`black`, and `data-note` classes/attributes.
+        *   Appends all created keys to the `#piano` container.
+        *   Populates a `keyElementMap` for quick access.
+        *   Calls `requestAnimationFrame(positionBlackKeys)` to defer positioning until the initial layout is done.
+    *   `positionBlackKeys()`:
+        *   Selects all `.black` keys.
+        *   For each black key, finds its preceding white key element (using the `keyElementMap`).
+        *   Gets the dynamic position and dimensions of the white key using `getBoundingClientRect`.
+        *   Calculates the `left` offset relative to the piano container.
+        *   Applies the calculated `left` style and uses `transform: translateX(-50%)` to center the black key visually over its target position.
+    *   The initial JSON view is populated for the default selected song.
+    *   Event listeners are attached (play, speed slider, song select, window resize). The resize listener is debounced and calls `positionBlackKeys`.
 
-3.  **JavaScript Logic:**
-    *   **Melody Definition:** The `twinkleMelody` array stores the sequence of notes and their durations. `null` is used for rests.
-    *   **Note Frequencies:** An object (`noteFrequencies`) maps note names (like 'C4') to their corresponding audio frequencies in Hertz.
-    *   **Audio Setup:** An `AudioContext` is initialized (lazily, on the first button click, to comply with browser autoplay policies).
-    *   **DOM References:** Elements like the button, display area, and all keys are selected using `getElementById` and `querySelectorAll`.
-    *   **`playNoteSound(note, duration)` Function:**
-        *   Takes a note name and duration.
-        *   If it's a valid note with a defined frequency:
-            *   Creates an `OscillatorNode` and a `GainNode` within the `AudioContext`.
-            *   Sets the oscillator's `type` (e.g., 'triangle') and `frequency`.
-            *   Connects the oscillator to the gain node, and the gain node to the `audioContext.destination` (speakers).
-            *   Sets the gain (volume) and schedules a quick ramp-down to 0 just before the note ends to prevent clicks.
-            *   Schedules the oscillator to `start()` immediately and `stop()` after the specified duration (converted to seconds).
-    *   **`highlightKey(note)` Function:**
-        *   Removes the `.active` class from all keys.
-        *   Finds the specific key element using its `data-note` attribute matching the input `note`.
-        *   Adds the `.active` class to that key.
-        *   Updates the `#note-display` text content. If the note is `null` (a rest), it clears the display.
-    *   **`playSong(melody)` Async Function:**
-        *   Disables the play button to prevent concurrent playback.
-        *   Ensures the `AudioContext` is running.
-        *   Iterates through the `melody` array using a `for...of` loop.
-        *   For each note item:
-            *   Calls `playNoteSound()` to start the audio.
-            *   Calls `highlightKey()` to update the visual state.
-            *   Uses `await delay(duration)` to pause execution for the note's duration.
-            *   Removes the highlight *after* the main duration but *before* the inter-note gap.
-            *   Uses `await delay(noteGap)` to add a small pause between notes.
-        *   Re-enables the play button once the loop finishes.
-    *   **Event Listener:** An event listener on the play button calls `initAudioContext()` (to ensure it's ready) and then `playSong()`.
+3.  **CSS Styling:**
+    *   `#piano` uses `display: flex` and `overflow: hidden`.
+    *   `.white` keys use `flex: 1 1 auto` allowing them to grow/shrink to fill the container width. `min-width` prevents excessive shrinking.
+    *   `.black` keys use `position: absolute`, `z-index: 2`, and have responsive width/height (e.g., percentage-based or max/min pixel values). Their exact horizontal position is determined by the JS-applied `left` style.
+
+4.  **User Interaction:**
+    *   **Song Selection:** Changing the dropdown triggers an event listener that calls `updateMusicJsonView()`.
+    *   **Speed Adjustment:** Moving the slider updates the `playbackSpeedFactor` variable and the displayed speed value.
+    *   **Play Button:**
+        *   Initializes/resumes the `AudioContext`.
+        *   Reads the selected song key and retrieves the corresponding `melody` array.
+        *   Reads the current `playbackSpeedFactor`.
+        *   Disables controls.
+        *   Calls the `async playSong(melody)` function.
+    *   **`playSong()` Execution:**
+        *   Iterates through the `melody` array.
+        *   For each `noteItem`:
+            *   Calls `playNoteSound()`, passing the note and duration. (Inside `playNoteSound`, the actual audio duration is divided by `playbackSpeedFactor`).
+            *   Calls `highlightKey()` using the `keyElementMap` for quick lookup.
+            *   `await delay(noteItem.duration)`: Pauses execution. (Inside `delay`, the pause time is divided by `playbackSpeedFactor`).
+            *   Removes the highlight.
+            *   Adds a small scaled gap using `await delay(noteGap)`.
+        *   Re-enables controls upon completion.
+    *   **`updateMusicJsonView()`:** Retrieves the selected melody data, uses `JSON.stringify(..., null, 2)` for formatting, and updates the `<pre>` tag's content.
 
 ## Setup and Usage
 
@@ -90,65 +108,18 @@ To see it in action, simply open the `index.html` file in a modern web browser.
 2.  Save the CSS code as `style.css` in the same directory.
 3.  Save the JavaScript code as `script.js` in the same directory.
 4.  Open `index.html` in a modern web browser (like Chrome, Firefox, Edge, Safari).
-5.  Click the "Play Twinkle Twinkle" button to start the animation and sound.
+5.  Select a song from the dropdown.
+6.  (Optional) Adjust the playback speed using the slider.
+7.  View the structure of the selected song in the "Selected Music Data" area.
+8.  Click the "Play Selected Song" button to start the animation and sound.
 
 ## Potential Expansions
 
-*   **More Songs:** Add a selection dropdown or buttons to choose different melodies. Store melody data in separate structures.
-*   **User Interaction:** Allow users to click on the piano keys (or use their computer keyboard) to play notes visually and audibly.
-*   **Improved Sound:**
-    *   Use different `OscillatorNode` types (`sine`, `square`, `sawtooth`).
-    *   Implement ADSR envelopes using `GainNode.gain.setValueAtTime` and `linearRampToValueAtTime` for more realistic note attack, decay, sustain, and release.
-    *   Load actual piano sound samples using `fetch` and `AudioContext.decodeAudioData` for high fidelity.
-*   **Visual Enhancements:**
-    *   Improve CSS for a more realistic piano look.
-    *   Add subtle animations or effects when keys are pressed.
-    *   Make the keyboard responsive to different screen sizes.
-*   **Playback Controls:** Add pause, stop, tempo control, or looping features.
-*   **Wider Key Range:** Expand the keyboard to multiple octaves.
-*   **Code Structure:** Refactor JavaScript into modules or classes for better organization, especially if adding more features.
-*   **Music Theory Display:** Show chords or scales related to the song being played.
-
----
-
-## Prompt for Recreating This Application
-
-```text
-Create a simple interactive web application using only vanilla HTML, CSS, and JavaScript (no external libraries or frameworks).
-
-**Objective:** Build an animated piano keyboard that plays the song "Twinkle Twinkle Little Star".
-
-**Requirements:**
-
-1.  **HTML Structure:**
-    *   Create `div` elements to represent the white and black keys of a basic piano keyboard (e.g., one octave from C4 to C5).
-    *   Use `data-note` attributes on each key `div` to store its corresponding note name (e.g., "C4", "C#4", "D4").
-    *   Include a `div` element to display the name of the note currently being played.
-    *   Include a `<button>` element to start the song playback.
-
-2.  **CSS Styling:**
-    *   Style the `div`s to visually resemble piano keys (appropriate size, color, borders).
-    *   Position the black keys correctly over the white keys using CSS positioning (e.g., `position: absolute`).
-    *   Create a CSS class (e.g., `.active`) that visually highlights a key when it's "pressed" (e.g., changes background color). Use CSS `transition` for a smooth effect.
-
-3.  **JavaScript Logic:**
-    *   **Melody Data:** Define the "Twinkle Twinkle Little Star" melody as a JavaScript data structure (e.g., an array of objects), where each object contains the `note` name (string, matching `data-note` attributes, use `null` for rests) and its `duration` (number, in milliseconds).
-    *   **Animation:** Write a function that iterates through the melody data. For each note:
-        *   Find the corresponding key element using its `data-note` attribute.
-        *   Add the `.active` CSS class to highlight the key.
-        *   Update the note display `div` with the current note name (clear it for rests).
-        *   Use `setTimeout` or `async/await` with Promises to wait for the specified `duration`.
-        *   Remove the `.active` class after the duration (or slightly before the next note).
-        *   Include a small, consistent delay between notes for clarity.
-    *   **Audio Playback:** Integrate the Web Audio API:
-        *   Create an `AudioContext` (ideally triggered by the user clicking the play button due to browser policies).
-        *   Create a function that takes a note name and duration.
-        *   Inside this function, if the note isn't a rest, create an `OscillatorNode` and a `GainNode`.
-        *   Map the note name to its standard frequency (Hz). Set the oscillator's frequency and type (e.g., 'triangle' or 'sine').
-        *   Connect the `OscillatorNode` to the `GainNode`, and the `GainNode` to the `audioContext.destination`.
-        *   Use the `GainNode` to control volume and apply a very short fade-out at the end of the note's duration to prevent clicks.
-        *   Schedule the oscillator to `start()` when the note should begin and `stop()` when it should end.
-        *   Call this audio playback function concurrently with the visual highlighting for each note in the melody sequence.
-    *   **Control:** Add an event listener to the play button that triggers the song animation and audio playback function. Disable the button during playback to prevent multiple instances.
-
-**Output:** Provide the complete HTML, CSS, and JavaScript code in separate, well-formatted blocks or files.
+*   **More Songs:** Add more melody data and corresponding `<option>` tags. Consider loading melodies from external JSON files.
+*   **User Piano Interaction:** Allow users to click/tap keys (or use computer keyboard) to play notes visually and audibly.
+*   **Improved Sound:** Implement ADSR envelopes (`GainNode` ramps) or load real piano samples (`AudioBufferSourceNode`).
+*   **Visual Enhancements:** Add more realistic key styling, pressing animations, or visual feedback for audio context state.
+*   **Playback Controls:** Add pause, stop, loop, or progress bar features.
+*   **Music Theory:** Display chord names or scale information related to the melody.
+*   **Error Handling:** More robust handling for missing frequencies or audio context issues.
+*   **Accessibility:** Improve ARIA attributes and keyboard navigation for controls and potentially the piano keys themselves.

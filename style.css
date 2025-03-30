@@ -2,74 +2,106 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    /* Removed justify-content: center to allow scrolling if needed */
     min-height: 100vh;
     background-color: #f0f0f0;
     font-family: sans-serif;
-    padding: 20px 0; /* Add some padding top/bottom */
+    padding: 15px;
+    box-sizing: border-box; /* Include padding in height calculation */
+    margin: 0;
+    width: 100%;
+    overflow-x: hidden; /* Prevent body scrollbars if piano slightly overflows */
+}
+
+h1 {
+    margin-top: 0;
+    margin-bottom: 15px;
 }
 
 .controls {
-    margin-bottom: 20px;
+    display: flex;
+    flex-wrap: wrap; /* Allow controls to wrap on smaller screens */
+    justify-content: center;
+    align-items: center;
+    gap: 20px; /* Spacing between control groups */
+    margin-bottom: 15px;
+    width: 100%;
+    max-width: 900px; /* Limit control width */
+}
+.controls > div { /* Group label/select and label/slider */
     display: flex;
     align-items: center;
-    gap: 15px; /* Spacing between label, select, button */
+    gap: 8px;
 }
+
 
 #piano {
     display: flex;
-    position: relative; /* Needed for absolute positioning of black keys */
+    position: relative;
     border: 2px solid #555;
     border-radius: 5px;
     background-color: #eee;
-    padding-bottom: 5px; /* Smaller space below keys */
+    /* Removed padding-bottom */
     margin-top: 10px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-    /* Allow horizontal scrolling if keyboard is too wide */
-    overflow-x: auto;
-    overflow-y: hidden; /* Hide vertical scrollbar */
-    min-height: 170px; /* Ensure container height */
-    width: 95%; /* Adjust width as needed */
-    max-width: 1200px; /* Max width */
+    /* Remove overflow-x: auto */
+    overflow: hidden; /* Hide anything extending beyond border */
+    height: 165px; /* Fixed height for consistency */
+    width: 95%; /* Responsive width */
+    max-width: 1400px; /* Max width */
+    box-sizing: border-box;
 }
 
 .key {
-    border: 1px solid #aaa; /* Lighter border */
+    border: 1px solid #aaa;
     box-sizing: border-box;
     transition: background-color 0.1s ease-in-out, transform 0.1s ease-in-out;
-    cursor: pointer; /* Indicate interaction */
-    flex-shrink: 0; /* Prevent keys from shrinking */
+    cursor: pointer;
+    /* flex-shrink: 0; NO - allow shrinking but not growing beyond flex basis */
+    height: 100%; /* Make keys fill container height */
 }
 
 .white {
-    width: 35px;  /* Narrower keys */
-    height: 160px; /* Shorter keys */
     background-color: white;
-    border-top: none;
+    /* Use flexbox to distribute width */
+    flex: 1 1 auto; /* Grow, Shrink, Basis */
+    min-width: 15px; /* Prevent collapsing too small */
     z-index: 1;
-    margin-right: -1px; /* Overlap borders slightly */
+    border-top: none;
+    border-bottom: none;
+     /* Add border-right back to separate flexing keys */
+    border-right: 1px solid #aaa;
+}
+.white:last-child {
+    border-right: none; /* No border on the very last key */
 }
 
+
 .black {
-    width: 22px; /* Narrower black keys */
-    height: 100px; /* Shorter black keys */
+    width: 60%; /* Width relative to the white key it overlaps */
+    max-width: 22px; /* But limit max width */
+    min-width: 10px; /* And min width */
+    height: 60%; /* Relative height */
     background-color: #333;
     position: absolute;
     top: 0;
     z-index: 2;
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;
-    /* 'left' style will be set by JavaScript */
+    border: 1px solid #555;
+    border-top: none;
+    /* 'left' and potentially 'transform' for centering will be set by JavaScript */
 }
 
 /* Highlight style */
 .key.active {
     background-color: #66d9ef;
-    transform: scale(0.98);
+    /* transform: scaleY(0.98); /* Press down effect */
+    /* filter: brightness(95%); */ /* Alternative highlight */
 }
 .black.active {
      background-color: #88eaff;
-     transform: scale(0.97);
+     /* transform: scaleY(0.97); */
+     /* filter: brightness(150%); */
 }
 
 
@@ -83,31 +115,102 @@ body {
     width: 100px;
 }
 
-#play-button {
-    padding: 8px 15px;
+#play-button, select, input[type="range"] {
+    padding: 8px 10px;
     font-size: 0.9em;
-    cursor: pointer;
-    border: none;
     border-radius: 5px;
+    border: 1px solid #ccc;
+}
+#play-button {
+    cursor: pointer;
     background-color: #4CAF50;
     color: white;
+    border: none;
     transition: background-color 0.2s;
 }
-
 #play-button:hover {
     background-color: #45a049;
 }
-
 #play-button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
 }
 
-select {
-    padding: 5px;
-    font-size: 0.9em;
+#speed-control {
+    vertical-align: middle; /* Align slider nicely */
+    width: 100px; /* Adjust slider width */
+}
+#speed-display {
+    min-width: 35px; /* Reserve space */
+    display: inline-block; /* Allow width */
+    text-align: right;
+    font-weight: bold;
 }
 
 label {
      font-size: 0.9em;
+}
+
+.music-view {
+    margin-top: 25px;
+    width: 90%;
+    max-width: 900px;
+    text-align: center;
+}
+.music-view h2 {
+    margin-bottom: 5px;
+    font-size: 1.1em;
+    color: #444;
+}
+#music-json-display {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 15px;
+    text-align: left;
+    white-space: pre-wrap; /* Allow wrapping */
+    word-wrap: break-word; /* Break long words */
+    max-height: 250px; /* Limit height */
+    overflow-y: auto; /* Add scroll if needed */
+    font-family: monospace;
+    font-size: 0.85em;
+    line-height: 1.4;
+    color: #333;
+}
+
+
+
+
+/* ... existing styles ... */
+
+.status-box {
+    margin-top: 15px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    text-align: center;
+    min-width: 200px; /* Give it some width */
+}
+
+#midi-status.disconnected {
+    background-color: #ffebee; /* Light red */
+    border: 1px solid #e57373; /* Reddish */
+    color: #c62828; /* Darker red */
+}
+
+#midi-status.connected {
+    background-color: #e8f5e9; /* Light green */
+    border: 1px solid #81c784; /* Greenish */
+    color: #2e7d32; /* Darker green */
+}
+
+#midi-status.searching {
+     background-color: #e3f2fd; /* Light blue */
+     border: 1px solid #90caf9; /* Bluish */
+     color: #1565c0; /* Darker blue */
+}
+#midi-status.unsupported {
+     background-color: #fff3e0; /* Light orange */
+     border: 1px solid #ffcc80; /* Orangish */
+     color: #ef6c00; /* Darker orange */
 }

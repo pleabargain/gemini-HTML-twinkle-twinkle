@@ -3,19 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Expanded Animated Piano</title>
+    <title>Responsive Animated Piano</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <h1>Animated Piano</h1>
 
     <div class="controls">
-        <label for="song-select">Choose a song:</label>
-        <select id="song-select">
-            <option value="twinkle">Twinkle Twinkle Little Star</option>
-            <option value="mary">Mary Had A Little Lamb</option>
-            <!-- Add more songs here -->
-        </select>
+        <div>
+            <label for="song-select">Choose a song:</label>
+            <select id="song-select">
+                <option value="twinkle">Twinkle Twinkle Little Star</option>
+                <option value="mary">Mary Had A Little Lamb</option>
+                <!-- Add more songs here -->
+            </select>
+        </div>
+        <div>
+             <label for="speed-control">Speed:</label>
+             <input type="range" id="speed-control" min="0.25" max="2.5" step="0.05" value="1">
+             <span id="speed-display">1.0x</span>
+        </div>
         <button id="play-button">Play Selected Song</button>
     </div>
 
@@ -24,6 +31,19 @@
 
     <!-- Piano keys will be generated here by JavaScript -->
     <div id="piano"></div>
+
+    <div class="music-view">
+        <h2>Selected Music Data (JSON)</h2>
+        <pre id="music-json-display"></pre>
+    </div>
+
+<!-- ... existing controls ... -->
+
+<div id="midi-status" class="status-box">Initializing MIDI...</div>
+
+<div id="note-display">--</div>
+<!-- ... rest of the HTML ... -->
+
 
     <script src="script.js"></script>
 </body>
