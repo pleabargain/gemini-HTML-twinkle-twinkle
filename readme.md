@@ -4,6 +4,8 @@ https://github.com/pleabargain/gemini-HTML-twinkle-twinkle
 
 # Responsive Animated Piano Keyboard
 
+Can now play notes based on user MIDI device input!
+
 ## Description
 
 This is an interactive web application that displays a **5-octave piano keyboard (C2-C7)** which **responds dynamically to the browser window size**. It animates the playing of selected melodies like "Twinkle Twinkle Little Star" and "Mary Had A Little Lamb". The application visually highlights the keys being pressed, shows the name of the current note, and plays the corresponding sound using the Web Audio API. Users can **select different songs**, **adjust the playback speed**, and **view the underlying musical data structure** for the selected piece.
