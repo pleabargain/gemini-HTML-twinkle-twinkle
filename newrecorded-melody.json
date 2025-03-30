@@ -1,0 +1,86 @@
+[
+  {
+    "note": null,
+    "duration": 3378
+  },
+  {
+    "note": [
+      "C4",
+      "E4",
+      "G4"
+    ],
+    "duration": 321
+  },
+  {
+    "note": null,
+    "duration": 1047
+  },
+  {
+    "note": [
+      "A4",
+      "D4",
+      "F#4"
+    ],
+    "duration": 866
+  },
+  {
+    "note": null,
+    "duration": 4371
+  },
+  {
+    "note": [
+      "B4",
+      "E4",
+      "G#4"
+    ],
+    "duration": 646
+  },
+  {
+    "note": null,
+    "duration": 485
+  },
+  {
+    "note": [
+      "A4",
+      "C5",
+      "F4"
+    ],
+    "duration": 1416
+  },
+  {
+    "note": null,
+    "duration": 591
+  },
+  {
+    "note": [
+      "B4",
+      "D5",
+      "G4"
+    ],
+    "duration": 449
+  },
+  {
+    "note": null,
+    "duration": 441
+  },
+  {
+    "note": [
+      "A4",
+      "C#5",
+      "E5"
+    ],
+    "duration": 502
+  },
+  {
+    "note": null,
+    "duration": 668
+  },
+  {
+    "note": [
+      "B4",
+      "D#5",
+      "F#5"
+    ],
+    "duration": 1386
+  }
+]

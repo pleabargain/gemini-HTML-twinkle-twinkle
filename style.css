@@ -214,3 +214,224 @@ label {
      border: 1px solid #ffcc80; /* Orangish */
      color: #ef6c00; /* Darker orange */
 }
+
+
+#record-button {
+    padding: 8px 15px;
+    font-size: 0.9em;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #e91e63; /* Pink/Red for record */
+    color: white;
+    transition: background-color 0.2s;
+}
+#record-button:hover {
+    background-color: #c2185b;
+}
+#record-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+#record-button.recording { /* Style when recording active */
+    background-color: #d81b60;
+    animation: pulse-red 1.5s infinite;
+}
+
+/* Optional pulsing animation for recording button */
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(233, 30, 99, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(233, 30, 99, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(233, 30, 99, 0); }
+}
+
+#recording-indicator { /* Style for the (REC) text */
+    margin-left: 8px;
+}
+
+
+/* ... existing styles ... */
+
+/* Remove or comment out old #note-display style if present */
+/* #note-display { ... } */
+
+/* New Styles for Note Scroller */
+#note-scroller-container {
+    width: 95%; /* Or a fixed width like 800px */
+    max-width: 1000px;
+    height: 50px; /* Adjust height as needed */
+    border: 1px solid #ccc;
+    background-color: #f8f8f8;
+    overflow-x: auto; /* Enable horizontal scrolling */
+    overflow-y: hidden; /* Hide vertical scrollbar */
+    margin-top: 15px;
+    position: relative; /* Useful for potential future absolute elements */
+    box-sizing: border-box;
+    /* Hide scrollbar visually (optional, browser-specific) */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+}
+#note-scroller-container::-webkit-scrollbar { /* Chrome/Safari/Opera */
+    display: none;
+}
+
+
+#note-scroller-content {
+    display: flex; /* Use flexbox for horizontal layout */
+    align-items: center; /* Center items vertically */
+    padding: 0 45%; /* Add padding left/right to allow centering first/last items */
+    height: 100%;
+    box-sizing: border-box;
+    /* If using inline-block instead of flex: */
+    /* display: inline-block; */
+    /* white-space: nowrap; */
+    /* height: 100%; */
+}
+
+.note-item {
+    display: inline-block; /* Needed for dimensions */
+    padding: 5px 12px;
+    margin: 0 3px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 0.9em;
+    white-space: nowrap; /* Prevent text wrapping within a note item */
+    transition: background-color 0.2s, color 0.2s, font-weight 0.2s;
+    text-align: center;
+    min-width: 40px; /* Ensure rests have some width */
+}
+
+.note-item.is-chord {
+    /* Optional: slightly different style for chords */
+     border-color: #bbb;
+}
+.note-item.is-rest {
+     color: #999;
+     font-style: italic;
+}
+
+.note-item.current-note-item { /* Highlighting style */
+    font-weight: bold;
+    background-color: #fffacd; /* Lemon chiffon */
+    color: #333;
+    border-color: #f0e68c; /* Khaki */
+    transform: scale(1.05); /* Slight scale effect */
+}
+
+/* ... existing styles ... */
+
+#stop-button {
+    padding: 8px 15px;
+    font-size: 0.9em;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #ff9800; /* Orange for stop */
+    color: white;
+    transition: background-color 0.2s;
+    margin-left: 5px; /* Add some space */
+}
+#stop-button:hover {
+    background-color: #f57c00;
+}
+#stop-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* --- Tab Styles --- */
+.tab-nav {
+    margin-bottom: 15px;
+    border-bottom: 2px solid #ccc;
+    display: flex; /* Align buttons */
+    justify-content: center; /* Center buttons */
+}
+
+.tab-button {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: none;
+    background-color: #e0e0e0; /* Default background */
+    border-bottom: 2px solid transparent; /* Space for active indicator */
+    margin-bottom: -2px; /* Overlap bottom border */
+    font-size: 1em;
+    transition: background-color 0.2s, border-color 0.2s;
+}
+
+.tab-button:hover {
+    background-color: #d5d5d5;
+}
+
+.tab-button.active {
+    background-color: #f0f0f0; /* Match body background */
+    border: 2px solid #ccc; /* Add border */
+    border-bottom: 2px solid #f0f0f0; /* Hide bottom border where it overlaps */
+    font-weight: bold;
+}
+
+.tab-container {
+    width: 100%; /* Take full width */
+}
+
+.tab-content {
+    display: none; /* Hide content by default */
+    padding: 15px 0; /* Add some padding */
+    animation: fadeIn 0.5s; /* Simple fade-in */
+}
+
+.tab-content.active {
+    display: block; /* Show active content */
+}
+
+/* Keyframes for fade-in animation */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+
+/* Minor adjustment for controls within the tab */
+.piano-controls {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 15px 25px; /* Row and column gap */
+    margin-bottom: 15px;
+    width: 100%;
+    max-width: 900px; /* Limit control width */
+    margin-left: auto; /* Center the controls section */
+    margin-right: auto;
+}
+.piano-controls > div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Ensure piano and scroller are centered within their tab */
+#note-scroller-container, #piano {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Optional: Style for temporary click feedback on scroller item */
+.note-item.clicked {
+    background-color: #cceeff; /* Light blue feedback */
+    border-color: #99ddff;
+    transform: scale(1.03);
+}
+
+/* ... existing styles ... */
+
+/* Style for the current song title display */
+.song-title-display {
+    text-align: center;
+    margin-top: 5px; /* Adjust spacing */
+    margin-bottom: 15px;
+    font-size: 1.2em;
+    color: #555;
+    font-weight: normal;
+}

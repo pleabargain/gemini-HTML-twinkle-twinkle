@@ -9,41 +9,63 @@
 <body>
     <h1>Animated Piano</h1>
 
-    <div class="controls">
-        <div>
-            <label for="song-select">Choose a song:</label>
-            <select id="song-select">
-                <option value="twinkle">Twinkle Twinkle Little Star</option>
-                <option value="mary">Mary Had A Little Lamb</option>
-                <!-- Add more songs here -->
-            </select>
-        </div>
-        <div>
-             <label for="speed-control">Speed:</label>
-             <input type="range" id="speed-control" min="0.25" max="2.5" step="0.05" value="1">
-             <span id="speed-display">1.0x</span>
-        </div>
-        <button id="play-button">Play Selected Song</button>
+    <!-- Tab Navigation -->
+    <div class="tab-nav">
+        <button class="tab-button active" data-tab="piano-tab">Piano</button>
+        <button class="tab-button" data-tab="json-tab">View JSON</button>
     </div>
 
+    <!-- Tab Content Container -->
+    <div class="tab-container">
 
-    <div id="note-display">--</div>
+        <!-- Piano Tab Content -->
+        <div id="piano-tab" class="tab-content active">
 
-    <!-- Piano keys will be generated here by JavaScript -->
-    <div id="piano"></div>
+            <!-- Add Current Song Title Display Here -->
+            <h3 id="current-song-title" class="song-title-display"></h3>
 
-    <div class="music-view">
-        <h2>Selected Music Data (JSON)</h2>
-        <pre id="music-json-display"></pre>
-    </div>
+            <div class="controls piano-controls">
+                <div>
+                    <label for="song-select">Choose a song:</label>
+                    <select id="song-select">
+                        <!-- Options populated by JS -->
+                    </select>
+                </div>
+                <div>
+                    <label for="speed-control">Speed:</label>
+                    <input type="range" id="speed-control" min="0.25" max="2.5" step="0.05" value="1">
+                    <span id="speed-display">1.0x</span>
+                </div>
+                <button id="play-button">Play</button>
+                <button id="stop-button" disabled>Stop</button>
+                <button id="record-button">Record</button>
+                <span id="recording-indicator" style="display: none; color: red; font-weight: bold;">(REC)</span>
+            </div>
 
-<!-- ... existing controls ... -->
+            <div id="midi-status" class="status-box">Initializing MIDI...</div>
 
-<div id="midi-status" class="status-box">Initializing MIDI...</div>
+            <!-- Note Scroller -->
+            <div id="note-scroller-container">
+                <div id="note-scroller-content">
+                    <!-- Note/Chord spans generated here -->
+                </div>
+            </div>
 
-<div id="note-display">--</div>
-<!-- ... rest of the HTML ... -->
+            <!-- Piano Keyboard -->
+            <div id="piano">
+                <!-- Keys generated here -->
+            </div>
+        </div>
 
+        <!-- JSON View Tab Content -->
+        <div id="json-tab" class="tab-content">
+            <div class="music-view">
+                <h2>Selected Music Data (JSON)</h2>
+                <pre id="music-json-display"></pre>
+            </div>
+        </div>
+
+    </div> <!-- End Tab Container -->
 
     <script src="script.js"></script>
 </body>
