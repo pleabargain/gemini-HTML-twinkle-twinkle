@@ -1,0 +1,113 @@
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* Removed justify-content: center to allow scrolling if needed */
+    min-height: 100vh;
+    background-color: #f0f0f0;
+    font-family: sans-serif;
+    padding: 20px 0; /* Add some padding top/bottom */
+}
+
+.controls {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Spacing between label, select, button */
+}
+
+#piano {
+    display: flex;
+    position: relative; /* Needed for absolute positioning of black keys */
+    border: 2px solid #555;
+    border-radius: 5px;
+    background-color: #eee;
+    padding-bottom: 5px; /* Smaller space below keys */
+    margin-top: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    /* Allow horizontal scrolling if keyboard is too wide */
+    overflow-x: auto;
+    overflow-y: hidden; /* Hide vertical scrollbar */
+    min-height: 170px; /* Ensure container height */
+    width: 95%; /* Adjust width as needed */
+    max-width: 1200px; /* Max width */
+}
+
+.key {
+    border: 1px solid #aaa; /* Lighter border */
+    box-sizing: border-box;
+    transition: background-color 0.1s ease-in-out, transform 0.1s ease-in-out;
+    cursor: pointer; /* Indicate interaction */
+    flex-shrink: 0; /* Prevent keys from shrinking */
+}
+
+.white {
+    width: 35px;  /* Narrower keys */
+    height: 160px; /* Shorter keys */
+    background-color: white;
+    border-top: none;
+    z-index: 1;
+    margin-right: -1px; /* Overlap borders slightly */
+}
+
+.black {
+    width: 22px; /* Narrower black keys */
+    height: 100px; /* Shorter black keys */
+    background-color: #333;
+    position: absolute;
+    top: 0;
+    z-index: 2;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
+    /* 'left' style will be set by JavaScript */
+}
+
+/* Highlight style */
+.key.active {
+    background-color: #66d9ef;
+    transform: scale(0.98);
+}
+.black.active {
+     background-color: #88eaff;
+     transform: scale(0.97);
+}
+
+
+#note-display {
+    margin-top: 15px;
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #333;
+    min-height: 1.2em;
+    text-align: center;
+    width: 100px;
+}
+
+#play-button {
+    padding: 8px 15px;
+    font-size: 0.9em;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #4CAF50;
+    color: white;
+    transition: background-color 0.2s;
+}
+
+#play-button:hover {
+    background-color: #45a049;
+}
+
+#play-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+select {
+    padding: 5px;
+    font-size: 0.9em;
+}
+
+label {
+     font-size: 0.9em;
+}

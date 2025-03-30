@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expanded Animated Piano</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Animated Piano</h1>
+
+    <div class="controls">
+        <label for="song-select">Choose a song:</label>
+        <select id="song-select">
+            <option value="twinkle">Twinkle Twinkle Little Star</option>
+            <option value="mary">Mary Had A Little Lamb</option>
+            <!-- Add more songs here -->
+        </select>
+        <button id="play-button">Play Selected Song</button>
+    </div>
+
+
+    <div id="note-display">--</div>
+
+    <!-- Piano keys will be generated here by JavaScript -->
+    <div id="piano"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
