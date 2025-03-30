@@ -4,124 +4,145 @@ https://github.com/pleabargain/gemini-HTML-twinkle-twinkle
 
 # Responsive Animated Piano Keyboard
 
-Can now play notes based on user MIDI device input!
+**Now with MIDI input, recording, chord support, scrolling display, and more!**
 
 ## Description
 
-This is an interactive web application that displays a **5-octave piano keyboard (C2-C7)** which **responds dynamically to the browser window size**. It animates the playing of selected melodies like "Twinkle Twinkle Little Star" and "Mary Had A Little Lamb". The application visually highlights the keys being pressed, shows the name of the current note, and plays the corresponding sound using the Web Audio API. Users can **select different songs**, **adjust the playback speed**, and **view the underlying musical data structure** for the selected piece.
+This is an interactive web application that displays a **5-octave piano keyboard (C2-C7)** which **responds dynamically to the browser window size**. It animates the playing of selected melodies (including **chords**) like "Twinkle Twinkle Little Star", "12 Bar Blues", etc. The application visually highlights keys, plays sound using the Web Audio API, and now **integrates with connected MIDI devices** for live input and **recording**.
+
+Users can **select different songs**, **adjust the playback speed**, view the **scrolling musical notation** (notes and basic chord names), **click notes** in the scroller to hear them, **record their own MIDI input**, and **save recordings** as JSON files. A **tabbed interface** separates the piano controls from the raw song data view.
 
 The entire application is built using vanilla HTML, CSS, and JavaScript, requiring no external libraries or frameworks.
 
 ## Features
 
-*   **Dynamically Generated Keyboard:** A 5-octave (C2-C7) keyboard is created programmatically using JavaScript.
-*   **Responsive Layout:** The piano keyboard adjusts its width to fit the browser window without requiring horizontal scrolling. White keys use CSS Flexbox, and black key positions are dynamically calculated.
-*   **Song Selection:** A dropdown menu allows users to choose from available melodies.
-*   **Playback Speed Control:** A slider allows adjusting the playback speed from slow (0.25x) to fast (2.5x).
-*   **Visual Animation:** Keys are highlighted sequentially as the selected melody plays.
-*   **Note Display:** Shows the name of the note currently being played (e.g., "C4", "G4").
-*   **Audio Playback:** Plays the notes using the Web Audio API's OscillatorNode, respecting the selected playback speed.
-*   **View Music Data:** Displays the raw JSON data for the currently selected song in a formatted view, updating automatically on selection change.
+*   **Dynamically Generated Keyboard:** A 5-octave (C2-C7) keyboard created programmatically.
+*   **Responsive Layout:** The piano adjusts its width without horizontal scrolling.
+*   **Tabbed Interface:** Separate views for "Piano" and "View JSON". **(New)**
+*   **Current Song Title Display:** Shows the name of the selected song. **(New)**
+*   **Song Selection:** Dropdown menu for available melodies.
+*   **Chord Handling:** Supports playback and recording of multiple simultaneous notes (chords). **(New)**
+*   **Scrolling Note/Chord Display:** Horizontally scrolls through the selected song, highlighting and centering the current note/chord. **(New)**
+*   **Basic Chord Naming:** Attempts to identify and display names for common chords (Maj, Min, 7, etc.) in the scroller. **(New)**
+*   **Clickable Scroller Items:** Click notes/chords in the scroller to hear a brief preview. **(New)**
+*   **Playback Speed Control:** Slider adjusts playback speed (0.25x to 2.5x).
+*   **Stop Button:** Halt automated playback immediately. **(New)**
+*   **Visual Animation:** Piano keys are highlighted during playback and MIDI input.
+*   **Audio Playback:** Uses Web Audio API (`OscillatorNode`) for sound generation.
+*   **MIDI Input Integration:** Detects connected MIDI devices (requires user permission), plays sounds, and highlights keys based on MIDI input. **(New)**
+*   **MIDI Recording:** Record notes and chords played on a connected MIDI device. **(New)**
+*   **Save Recording:** Save recorded performances as a structured JSON file directly from the browser (client-side saving). **(New)**
+*   **View Music Data:** The "View JSON" tab displays the raw data structure for the selected song or a saved recording.
 *   **Pure Vanilla JS:** Built entirely with standard HTML, CSS, and JavaScript.
 
 ## Demo
 
 *(You could add a link to a live demo or an animated GIF here if you host it)*
 
-To see it in action, simply open the `index.html` file in a modern web browser.
+To see it in action, simply open the `index.html` file in a modern web browser (Chrome/Edge recommended for full Web MIDI support).
 
 ## Technology Stack
 
-*   **HTML:** Structures the piano container, note display, song selection dropdown (`<select>`), speed control slider (`<input type="range">`), play button, and the JSON view area (`<pre>`). Uses `data-note` attributes on keys.
+*   **HTML:** Structures the **tabbed layout**, piano container, scrolling note display, controls (`<select>`, `<input type="range">`, `<button>`), MIDI status, and JSON view area (`<pre>`). Uses `data-note` attributes on keys and `data-tab` for navigation. **(Updated)**
 *   **CSS:**
-    *   Styles the piano appearance.
-    *   Uses **Flexbox** (`display: flex`, `flex: 1`) on white keys for responsive width distribution.
-    *   Styles black keys with `position: absolute` and relative/limited dimensions. `left` and `transform` properties are set dynamically via JS.
-    *   Manages container layout (`#piano`, `.controls`) and styling for interactive elements.
-    *   Uses an `.active` class for the key highlight effect with `transition`.
-*   **JavaScript:** Handles all the logic:
-    *   **DOM Manipulation:** Dynamically creates key elements, selects UI controls, updates note display, adds/removes CSS classes, updates JSON view text.
-    *   **Keyboard Generation & Positioning:**
-        *   Loops through octaves and notes to create `div` elements for keys.
-        *   Uses `requestAnimationFrame` after initial render to calculate and apply the `style.left` and `style.transform` for black keys based on the computed position and size of the preceding white keys (`getBoundingClientRect`).
-        *   Handles window resize events (debounced) to recalculate black key positions.
-    *   **Timing & Animation:** Uses `async/await` with a `delay` helper function (which incorporates the `playbackSpeedFactor`) to sequence note highlights and pauses accurately.
-    *   **Data Structures:** Represents melodies as arrays of objects (`note`, `duration`). A main `melodies` object maps dropdown values to specific melody arrays. A `keyElementMap` object provides quick lookup of key DOM elements by note name.
-    *   **Web Audio API:** Generates and plays sound:
-        *   Initializes `AudioContext` on user interaction.
-        *   Maps note names to frequencies (`noteFrequencies` object).
-        *   Uses `OscillatorNode` and `GainNode`.
-        *   **Scales audio note duration** and fade-out times based on the `playbackSpeedFactor`.
-    *   **Event Handling:** Listens for clicks (play button), input changes (speed slider), selection changes (song dropdown), and window resize.
-    *   **State Management:** Uses variables like `playbackSpeedFactor` and `audioContext`.
+    *   Styles the piano, controls, **tabs**, and **scrolling display**. **(Updated)**
+    *   Uses **Flexbox** for responsive key width and layout management.
+    *   Uses `position: absolute` and JS-calculated `left`/`transform` for black keys. **(Updated)**
+    *   Uses `.active` / `.current-note-item` classes for highlighting.
+*   **JavaScript:** Handles all logic:
+    *   **DOM Manipulation:** Creates keyboard/scroller elements, selects controls, updates text/classes, manages tab visibility. **(Updated)**
+    *   **Keyboard Generation & Positioning:** Uses loops and `requestAnimationFrame` for dynamic creation and positioning based on `getBoundingClientRect`.
+    *   **Tab Switching:** Handles click events on tab buttons to toggle `active` classes on content divs. **(New)**
+    *   **Timing & Animation:** Uses `async/await` and a scaled `delay` function for automated playback sequencing.
+    *   **Data Structures:** Represents melodies as arrays of objects (`note` can be string, array, or null; `duration`). Uses a `melodies` object map and a `keyElementMap` for DOM lookups. **(Updated)**
+    *   **Web Audio API:** Initializes `AudioContext`, maps notes to frequencies, uses `OscillatorNode`/`GainNode` for sound, respects `playbackSpeedFactor`. Manages distinct sound generation for automated playback (`playNoteSound`) vs. MIDI input (`playMIDINoteSound`/`stopMIDINoteSound`). **(Updated)**
+    *   **Web MIDI API:** Checks for support, requests access (`navigator.requestMIDIAccess`), lists devices, attaches `onmidimessage` listeners, parses MIDI messages (Note On/Off), handles device state changes. **(New)**
+    *   **MIDI Recording & Processing:** Captures MIDI events with timestamps (`performance.now()`), processes the raw event list (`processRecording`) to group notes into chords (based on `CHORD_THRESHOLD`) and detect rests (based on `REST_THRESHOLD`), generating the standard melody data structure. **(New)**
+    *   **Client-Side Saving:** Creates a JSON `Blob`, generates an object URL (`URL.createObjectURL`), and uses a temporary `<a>` element with the `download` attribute to trigger a save prompt. **(New)**
+    *   **Scrolling Display Logic:** Populates the scroller with `<span>` elements (`populateNoteScroller`), including basic chord names (`getChordName`). Updates highlighting and scrolls to center the active item (`updateNoteScroller`) during playback. Handles clicks on scroller items (`playNoteItemOnClick`). **(New)**
+    *   **Event Handling:** Listens for clicks (tabs, play, stop, record, scroller items), input changes (speed slider), selection changes (song dropdown), MIDI messages, and window resize. **(Updated)**
+    *   **State Management:** Uses flags like `isPlaybackActive`, `isRecording`, and tracks `currentNoteItemIndex`, `activeMIDINotes`, etc. **(Updated)**
 
 ## How It Works (Approach)
 
 1.  **HTML Structure:**
-    *   A main container (`#piano`) is defined, initially empty.
-    *   Control elements (`<select>`, `<input type="range">`, `<button>`) and display areas (`#note-display`, `#music-json-display`) are set up.
+    *   A **tab navigation** (`.tab-nav`) controls visibility of content divs (`.tab-content`) within a `.tab-container`. **(New)**
+    *   The "Piano" tab contains controls, MIDI status, the **scrolling note display container** (`#note-scroller-container > #note-scroller-content`), and the piano keyboard container (`#piano`). **(Updated)**
+    *   The "View JSON" tab contains the `<pre>` element for displaying song data. **(New)**
 
-2.  **JavaScript Initialization:**
-    *   On script load, the `createKeyboard()` function is called.
-    *   `createKeyboard()`:
-        *   Clears the `#piano` container.
-        *   Loops from `START_OCTAVE` to `END_OCTAVE`, creating `div` elements for each note ('C' through 'B').
-        *   Assigns `key`, `white`/`black`, and `data-note` classes/attributes.
-        *   Appends all created keys to the `#piano` container.
-        *   Populates a `keyElementMap` for quick access.
-        *   Calls `requestAnimationFrame(positionBlackKeys)` to defer positioning until the initial layout is done.
-    *   `positionBlackKeys()`:
-        *   Selects all `.black` keys.
-        *   For each black key, finds its preceding white key element (using the `keyElementMap`).
-        *   Gets the dynamic position and dimensions of the white key using `getBoundingClientRect`.
-        *   Calculates the `left` offset relative to the piano container.
-        *   Applies the calculated `left` style and uses `transform: translateX(-50%)` to center the black key visually over its target position.
-    *   The initial JSON view is populated for the default selected song.
-    *   Event listeners are attached (play, speed slider, song select, window resize). The resize listener is debounced and calls `positionBlackKeys`.
+2.  **JavaScript Initialization (`initializeApp`):** **(Updated)**
+    *   Calls `createKeyboard()` to generate piano key elements and map them.
+    *   Calls `populateSongSelect()` to fill the dropdown.
+    *   Calls `updateMusicJsonView()` and `populateNoteScroller()` for the initially selected song.
+    *   Sets initial speed display text.
+    *   Disables the stop button.
+    *   Calls `initializeMIDI()` to attempt connection.
+    *   Attaches all necessary event listeners (including tab switching).
 
-3.  **CSS Styling:**
-    *   `#piano` uses `display: flex` and `overflow: hidden`.
-    *   `.white` keys use `flex: 1 1 auto` allowing them to grow/shrink to fill the container width. `min-width` prevents excessive shrinking.
-    *   `.black` keys use `position: absolute`, `z-index: 2`, and have responsive width/height (e.g., percentage-based or max/min pixel values). Their exact horizontal position is determined by the JS-applied `left` style.
+3.  **Tab Switching:** Click listeners on `.tab-button` elements toggle the `.active` class on buttons and corresponding `.tab-content` divs. **(New)**
 
-4.  **User Interaction:**
-    *   **Song Selection:** Changing the dropdown triggers an event listener that calls `updateMusicJsonView()`.
-    *   **Speed Adjustment:** Moving the slider updates the `playbackSpeedFactor` variable and the displayed speed value.
-    *   **Play Button:**
-        *   Initializes/resumes the `AudioContext`.
-        *   Reads the selected song key and retrieves the corresponding `melody` array.
-        *   Reads the current `playbackSpeedFactor`.
-        *   Disables controls.
-        *   Calls the `async playSong(melody)` function.
-    *   **`playSong()` Execution:**
-        *   Iterates through the `melody` array.
-        *   For each `noteItem`:
-            *   Calls `playNoteSound()`, passing the note and duration. (Inside `playNoteSound`, the actual audio duration is divided by `playbackSpeedFactor`).
-            *   Calls `highlightKey()` using the `keyElementMap` for quick lookup.
-            *   `await delay(noteItem.duration)`: Pauses execution. (Inside `delay`, the pause time is divided by `playbackSpeedFactor`).
-            *   Removes the highlight.
-            *   Adds a small scaled gap using `await delay(noteGap)`.
-        *   Re-enables controls upon completion.
-    *   **`updateMusicJsonView()`:** Retrieves the selected melody data, uses `JSON.stringify(..., null, 2)` for formatting, and updates the `<pre>` tag's content.
+4.  **MIDI Handling:** **(New)**
+    *   `initializeMIDI` uses `navigator.requestMIDIAccess`.
+    *   `onMIDISuccess` attaches `handleMIDIMessage` to detected inputs.
+    *   `handleMIDIMessage` parses incoming Note On/Off messages:
+        *   If recording, pushes event data with timestamp to `recordedMIDIEvents`.
+        *   Triggers `playMIDINoteSound`/`stopMIDINoteSound` for live audio feedback.
+        *   Adds/removes `.active` class on the corresponding piano key element.
+
+5.  **Recording & Saving:** **(New)**
+    *   Record button toggles `isRecording` state.
+    *   While recording, MIDI events are stored.
+    *   On stop, `processRecording` is called:
+        *   Sorts raw events.
+        *   Iterates through, grouping 'on' events within `CHORD_THRESHOLD` into blocks.
+        *   Determines block duration by finding the latest 'off' time for notes started in that block.
+        *   Detects rests based on time gaps (`REST_THRESHOLD`).
+        *   Builds the `processedMelody` array (using arrays for chords).
+    *   `saveRecordingToFile` converts the processed data to JSON, creates a Blob URL, and simulates a click on a download link.
+
+6.  **Automated Playback (`playSong`):** **(Updated)**
+    *   Sets `isPlaybackActive` flag, disables/enables controls appropriately (including Stop button).
+    *   Calls `populateNoteScroller` first.
+    *   Loops through the `melody` array:
+        *   Checks `isPlaybackActive` flag to allow stopping mid-song.
+        *   Calls `updateNoteScroller` to highlight/center the current item.
+        *   Calls `highlightPianoKeys` for the piano display.
+        *   Calls `playNoteSound` for each note in the item (handles single notes and chords).
+        *   Uses scaled `delay()` for note/chord duration and inter-note gaps.
+    *   Uses a `finally` block to ensure cleanup (resetting flags, controls, highlights) occurs even if stopped early.
+
+7.  **Scrolling Display:** **(New)**
+    *   `populateNoteScroller` creates `<span>` elements for each melody item, calling `getChordName` for chords/notes. It attaches click listeners here.
+    *   `getChordName` performs basic interval analysis to name common chords.
+    *   `updateNoteScroller` adds/removes `.current-note-item` class and uses `element.scrollTo()` with `behavior: 'smooth'` to center the active item.
+    *   `playNoteItemOnClick` handles click events on scroller items, playing a short preview sound.
 
 ## Setup and Usage
 
 1.  Save the HTML code as `index.html`.
 2.  Save the CSS code as `style.css` in the same directory.
 3.  Save the JavaScript code as `script.js` in the same directory.
-4.  Open `index.html` in a modern web browser (like Chrome, Firefox, Edge, Safari).
-5.  Select a song from the dropdown.
-6.  (Optional) Adjust the playback speed using the slider.
-7.  View the structure of the selected song in the "Selected Music Data" area.
-8.  Click the "Play Selected Song" button to start the animation and sound.
+4.  **(Optional)** Connect a MIDI keyboard or controller to your computer.
+5.  Open `index.html` in a modern web browser (Chrome/Edge recommended for Web MIDI).
+6.  **Grant Permission:** If using MIDI, the browser will likely ask for permission to access MIDI devices. Allow it.
+7.  Check the **MIDI Status** indicator.
+8.  Use the **tabs** to switch between the Piano view and the JSON view.
+9.  Select a song from the dropdown - the **song title** and **scrolling display** will update.
+10. (Optional) Adjust the playback speed using the slider.
+11. Click notes/chords in the **scrolling display** to hear them.
+12. Click **"Play"** to start automated playback; click **"Stop"** to halt it.
+13. Click **"Record"** to start recording MIDI input, play on your device, and click **"Stop Recording"** when finished. You will be prompted to save the recording as a JSON file.
+14. Explore the song structure in the **"View JSON"** tab.
 
 ## Potential Expansions
 
-*   **More Songs:** Add more melody data and corresponding `<option>` tags. Consider loading melodies from external JSON files.
-*   **User Piano Interaction:** Allow users to click/tap keys (or use computer keyboard) to play notes visually and audibly.
-*   **Improved Sound:** Implement ADSR envelopes (`GainNode` ramps) or load real piano samples (`AudioBufferSourceNode`).
-*   **Visual Enhancements:** Add more realistic key styling, pressing animations, or visual feedback for audio context state.
-*   **Playback Controls:** Add pause, stop, loop, or progress bar features.
-*   **Music Theory:** Display chord names or scale information related to the melody.
-*   **Error Handling:** More robust handling for missing frequencies or audio context issues.
-*   **Accessibility:** Improve ARIA attributes and keyboard navigation for controls and potentially the piano keys themselves.
+*   **More Songs/Load External:** Load melody data from external JSON files instead of hardcoding. Allow users to load their saved recordings.
+*   **Improved Chord Detection:** Implement more sophisticated chord detection (inversions, extensions, suspensions).
+*   **Visual Metronome:** Add a visual indicator for tempo during playback/recording.
+*   **Improved Sound:** Implement ADSR envelopes or load real piano samples.
+*   **MIDI Velocity Handling:** Use recorded/live MIDI velocity more effectively to control note volume/timbre.
+*   **MIDI Control Changes:** Handle other MIDI messages like sustain pedal (CC 64), pitch bend, etc.
+*   **On-Screen Keyboard Interaction:** Allow playing notes by clicking the virtual piano keys.
+*   **Error Handling:** More detailed feedback for MIDI connection issues or file saving errors.
+*   **Accessibility:** Improve ARIA roles and keyboard navigation.
+*   **Performance Optimization:** For very long recordings or complex melodies, optimize the `processRecording` or rendering logic.

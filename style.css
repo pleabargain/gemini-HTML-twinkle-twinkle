@@ -435,3 +435,13 @@ label {
     color: #555;
     font-weight: normal;
 }
+
+.live-display {
+    text-align: center;
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #3d5afe; /* Example color */
+    margin-top: 10px;
+    min-height: 1.2em; /* Prevent layout jump */
+    padding: 5px;
+}
