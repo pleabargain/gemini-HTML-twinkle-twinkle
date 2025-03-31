@@ -31,6 +31,8 @@ const tabButtons = document.querySelectorAll('.tab-button');
 const tabContents = document.querySelectorAll('.tab-content');
 const currentSongTitleDisplay = document.getElementById('current-song-title');
 const liveMidiDisplay = document.getElementById('live-midi-display'); // Element to show live MIDI input
+const loadButton = document.getElementById('load-button');
+const jsonFileInput = document.getElementById('json-file-input');
 
 // --- Global Variables & State ---
 let keys = []; // Array of piano key DOM elements
@@ -653,6 +655,160 @@ function saveRecordingToFile(dataToSave, filename = "recorded-melody.json") {
 }
 
 // ==============================================
+//          LOAD CUSTOM RECORDINGS
+// ==============================================
+
+// Load recording from a local file
+function loadCustomRecording(file) {
+    if (!file) {
+        console.error("No file selected");
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        try {
+            const jsonData = JSON.parse(event.target.result);
+            
+            // Validate the JSON structure
+            if (!Array.isArray(jsonData)) {
+                throw new Error("Invalid JSON format: Expected an array");
+            }
+            
+            // Check if the array contains valid melody items
+            const isValidMelody = jsonData.every(item => 
+                typeof item === 'object' && 
+                item !== null && 
+                'duration' in item && 
+                ('note' in item || item.note === null)
+            );
+            
+            if (!isValidMelody) {
+                throw new Error("Invalid melody format: Each item must have 'note' and 'duration' properties");
+            }
+            
+            // Add the loaded melody to the melodies object
+            const fileName = file.name.replace('.json', '');
+            const safeKey = fileName.replace(/[^a-zA-Z0-9]/g, '_');
+            
+            // Add the melody to the melodies object
+            melodies[safeKey] = jsonData;
+            
+            // Update the song select dropdown
+            const option = document.createElement('option');
+            option.value = safeKey;
+            option.textContent = fileName;
+            songSelect.appendChild(option);
+            
+            // Select the newly added melody
+            songSelect.value = safeKey;
+            
+            // Update the UI
+            updateMusicJsonView(safeKey);
+            populateNoteScroller(jsonData);
+            updateCurrentSongTitle();
+            
+            console.log(`Loaded custom recording: ${fileName}`);
+            alert(`Successfully loaded "${fileName}"`);
+        } catch (error) {
+            console.error("Error loading JSON file:", error);
+            alert(`Error loading file: ${error.message}`);
+        }
+    };
+    
+    reader.onerror = function() {
+        console.error("Error reading file");
+        alert("Error reading file");
+    };
+    
+    reader.readAsText(file);
+}
+
+// Load recordings from Supabase
+async function loadRecordingsFromSupabase() {
+    try {
+        const response = await fetch('/api/recordings');
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        
+        const recordings = await response.json();
+        
+        // Clear existing custom recordings from dropdown
+        const options = Array.from(songSelect.options);
+        options.forEach(option => {
+            // Keep built-in melodies
+            if (!['twinkle', 'mary', 'chords', '12BarBluesC'].includes(option.value)) {
+                songSelect.removeChild(option);
+            }
+        });
+        
+        // Add recordings to melodies object and dropdown
+        recordings.forEach(recording => {
+            const safeKey = `online_${recording.id}`;
+            melodies[safeKey] = recording.melody;
+            
+            const option = document.createElement('option');
+            option.value = safeKey;
+            option.textContent = `${recording.title} (Online)`;
+            songSelect.appendChild(option);
+        });
+        
+        console.log(`Loaded ${recordings.length} recordings from Supabase`);
+    } catch (error) {
+        console.error('Error loading recordings from Supabase:', error);
+    }
+}
+
+// Save recording to Supabase
+async function saveRecordingToSupabase(melody, title) {
+    try {
+        const response = await fetch('/api/recordings', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                title,
+                melody
+            }),
+        });
+        
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP error! Status: ${response.status}`);
+        }
+        
+        const savedRecording = await response.json();
+        
+        // Add to melodies object
+        const safeKey = `online_${savedRecording.id}`;
+        melodies[safeKey] = melody;
+        
+        // Add to dropdown
+        const option = document.createElement('option');
+        option.value = safeKey;
+        option.textContent = `${title} (Online)`;
+        songSelect.appendChild(option);
+        
+        // Select the newly added melody
+        songSelect.value = safeKey;
+        updateMusicJsonView(safeKey);
+        populateNoteScroller(melody);
+        updateCurrentSongTitle();
+        
+        console.log(`Saved recording to Supabase with ID: ${savedRecording.id}`);
+        alert(`Successfully saved "${title}" to Supabase`);
+        
+        return savedRecording;
+    } catch (error) {
+        console.error('Error saving recording to Supabase:', error);
+        alert(`Error saving to Supabase: ${error.message}`);
+        return null;
+    }
+}
+
+// ==============================================
 //          UI & EVENT LISTENERS
 // ==============================================
 
@@ -738,8 +894,22 @@ recordButton.addEventListener('click', () => {
             console.log("MIDI Recording Stopped. Raw Events:", recordedMIDIEvents);
             const processedData = processRecording(recordedMIDIEvents);
             console.log("Processed Recording:", processedData);
-            if (processedData.length > 0) { saveRecordingToFile(processedData); }
-            else { alert("Recording was empty or contained no valid notes."); }
+            
+            if (processedData.length > 0) {
+                // Save locally
+                saveRecordingToFile(processedData);
+                
+                // Ask if user wants to save to Supabase
+                const saveOnline = confirm("Would you like to save this recording online to Supabase?");
+                if (saveOnline) {
+                    const title = prompt("Enter a title for your recording:", "My Recording");
+                    if (title) {
+                        saveRecordingToSupabase(processedData, title);
+                    }
+                }
+            } else { 
+                alert("Recording was empty or contained no valid notes."); 
+            }
          }
      } else { console.log("Cannot record during playback."); }
 });
@@ -763,6 +933,21 @@ window.addEventListener('resize', () => {
     }, 150);
 });
 
+// Load button click handler
+loadButton.addEventListener('click', () => {
+    jsonFileInput.click(); // Trigger the file input dialog
+});
+
+// File input change handler
+jsonFileInput.addEventListener('change', (event) => {
+    const file = event.target.files[0];
+    if (file) {
+        loadCustomRecording(file);
+    }
+    // Reset the file input so the same file can be selected again if needed
+    jsonFileInput.value = '';
+});
+
 // ==============================================
 //          INITIAL SETUP on Load
 // ==============================================
@@ -777,6 +962,12 @@ function initializeApp() {
     stopButton.disabled = true; // Ensure stop is disabled
     if (liveMidiDisplay) liveMidiDisplay.textContent = '--'; // Initialize live display area
     initializeMIDI(); // Attempt MIDI connection
+    
+    // Load recordings from Supabase
+    loadRecordingsFromSupabase().catch(error => {
+        console.error("Failed to load recordings from Supabase:", error);
+    });
+    
     console.log("Responsive Animated Piano Initialized.");
 }
 

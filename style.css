@@ -238,6 +238,31 @@ label {
     animation: pulse-red 1.5s infinite;
 }
 
+.file-input-container {
+    display: inline-flex;
+    align-items: center;
+}
+
+#load-button {
+    padding: 8px 15px;
+    font-size: 0.9em;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #2196F3; /* Blue for load */
+    color: white;
+    transition: background-color 0.2s;
+}
+
+#load-button:hover {
+    background-color: #0b7dda;
+}
+
+#load-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
 /* Optional pulsing animation for recording button */
 @keyframes pulse-red {
     0% { box-shadow: 0 0 0 0 rgba(233, 30, 99, 0.7); }

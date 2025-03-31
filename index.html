@@ -40,6 +40,10 @@
                 <button id="stop-button" disabled>Stop</button>
                 <button id="record-button">Record</button>
                 <span id="recording-indicator" style="display: none; color: red; font-weight: bold;">(REC)</span>
+                <div class="file-input-container">
+                    <button id="load-button">Load JSON</button>
+                    <input type="file" id="json-file-input" accept=".json" style="display: none;">
+                </div>
             </div>
 
             <div id="midi-status" class="status-box">Initializing MIDI...</div>
